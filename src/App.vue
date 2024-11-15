@@ -131,7 +131,7 @@ const sendUSDT = async () => {
   if (!isValidTransaction.value) {
     transactionStatus.value = {
       type: 'error',
-      message: 'Invalid address or amount must be greater than 0',
+      message: 'Địa chỉ không hợp lệ hoặc số tiền phải lớn hơn 0',
     };
     return;
   }
@@ -139,7 +139,7 @@ const sendUSDT = async () => {
   try {
     transactionStatus.value = {
       type: 'pending',
-      message: 'Processing transaction...',
+      message: 'Đang xử lý giao dịch...',
     };
 
     const provider = new ethers.BrowserProvider(window.ethereum);
@@ -151,7 +151,7 @@ const sendUSDT = async () => {
       chainId === 42161n ? USDT_ADDRESSES.arbitrum : USDT_ADDRESSES.ethereum;
 
     const usdtContract = new Contract(usdtAddress, USDT_ABI, signer);
-    const amountInUnits = parseUnits(amount.value, 6);
+    const amountInUnits = parseUnits(String(amount.value), 6); // Đảm bảo giá trị là chuỗi
 
     const transaction = await usdtContract.transfer(
       recipientAddress.value,
@@ -160,23 +160,23 @@ const sendUSDT = async () => {
 
     transactionStatus.value = {
       type: 'pending',
-      message: 'Waiting for confirmation...',
+      message: 'Đang chờ xác nhận...',
     };
 
     await transaction.wait();
 
     transactionStatus.value = {
       type: 'success',
-      message: `Transaction successful! Hash: ${transaction.hash}`,
+      message: `Giao dịch thành công! Mã giao dịch: ${transaction.hash}`,
     };
 
     recipientAddress.value = '';
     amount.value = '0.01';
   } catch (error) {
-    console.error('Transaction failed:', error);
+    console.error('Giao dịch thất bại:', error);
     transactionStatus.value = {
       type: 'error',
-      message: `Transaction failed: ${error.message}`,
+      message: `Giao dịch thất bại: ${error.message}`,
     };
   }
 };
